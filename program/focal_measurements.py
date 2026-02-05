@@ -11,7 +11,7 @@ from tkinter import messagebox
 
 from utils import external_folder, resource_path
 from controller import activate_filter, led_on, move_to_position, led_off, led_intensity
-from camara import capture_image_array
+from camera_functions import capture_image_array
 from communication import read_current_position
 #from utils import mm_to_steps
 

@@ -10,12 +10,12 @@ from controller import (
 from communication import (
     send_command, read_current_position, arduino, refresh_ports, connect_arduino
 )
-from camara import (
-    toggle_camera, take_photo, save_current_photo,
+from camera_functions import (
+    cap, recording, video_writer, set_camera_index, toggle_camera, take_photo, save_current_photo,
     toggle_recording, update_photo_display, refresh_cameras
 )
-from auto import open_auto_mode_window
-import camara
+from automatic_gui import open_auto_mode_window
+# import camera_functions
 from utils import resource_path
 
 def abrir_ventana_conexion():
@@ -87,7 +87,8 @@ def abrir_ventana_conexion():
         except ValueError:
             cam_index = 0 
 
-        camara.set_camera_index(cam_index)
+        # camera_functions.set_camera_index(cam_index)
+        set_camera_index(cam_index)
 
         # Try to connect Arduino
         if connect_arduino(selected_port):
@@ -326,7 +327,7 @@ def iniciar_interfaz():
     def on_closing():
         led_off()
         
-        from camara import cap, recording, video_writer
+        # from camera_functions import cap, recording, video_writer
         if cap: cap.release()
         if recording and video_writer: video_writer.release()
         

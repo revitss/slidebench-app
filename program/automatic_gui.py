@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import simpledialog
-from camara import start_live_view, turn_off_camera_auto
+from camera_functions import start_live_view, turn_off_camera_auto
 from focal_measurements import automatic_measurement, save_measurement_data, do_reference
 import threading
 from pathlib import Path

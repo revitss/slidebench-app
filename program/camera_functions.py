@@ -36,7 +36,6 @@ def refresh_cameras():
         return cameras if cameras else ["No cameras found"]
     except Exception as e:
         print(f"Error detecting cameras: {e}")
-        return ["Error detecting cameras"]
 
 
 def create_daily_folder():
@@ -75,7 +74,7 @@ def toggle_camera(camera_label, btn):
         cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
         if not cap.isOpened():
-            print("⚠️ Unable to open camera.")
+            print("Unable to open camera.")
             return
         camera_active = True
         update_frame(camera_label)
@@ -137,7 +136,7 @@ def save_current_photo(btn_save_photo):
     """Saves the last captured photo to disk."""
     global last_preview_image, photo_path
     if last_preview_image is None:
-        print("⚠️ No photo to save.")
+        print("No photo to save.")
         return
 
     day_folder = create_daily_folder()
@@ -152,7 +151,7 @@ def save_current_photo(btn_save_photo):
         print(f"📸 Photo saved as {filename} in {day_folder}")
         btn_save_photo.grid_remove()
     except Exception as e:
-        print(f"⚠️ Error saving photo: {e}")
+        print(f"Error saving photo: {e}")
 
 
 def start_recording():
@@ -166,7 +165,7 @@ def start_recording():
 
     ret, frame = cap.read()
     if not ret:
-        print("⚠️ Could not read initial frame for recording.")
+        print("Could not read initial frame for recording.")
         recording = False
         return
 
@@ -241,7 +240,7 @@ def start_live_view(target_label):
         cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
         if not cap.isOpened():
-            print("⚠️ Unable to open camera.")
+            print("Unable to open camera.")
             return
         camera_active = True
 
