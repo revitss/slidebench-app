@@ -1,5 +1,5 @@
 import os
-os.environ["OMP_NUM_THREADS"] = "1"  # Mejora rendimiento de OpenCV
+os.environ["OMP_NUM_THREADS"] = "1"  # Improves OpenCV performance
 import time
 from datetime import datetime
 import numpy as np
@@ -148,7 +148,7 @@ def do_reference():
     # --- Save vector reference distances
     np.save(REFERENCE_PATH, np.array(y0))
 
-    # tunr of led and activate filter w
+    # --- Turn of led and activate filter w
     led_off()
     activate_filter('w')
 

@@ -155,4 +155,3 @@ def led_intensity(valor):
 #     """Turns on the LED at maximum brightness."""
 #     encender_led()
 #     set_intensidad_led(10)
-
