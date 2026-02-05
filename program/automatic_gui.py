@@ -97,7 +97,7 @@ def open_auto_mode_window(root):
             data = local_results.get(flt)
 
             if not isinstance(data, dict):
-                result_text.insert(tk.END, "  ⚠️ Data not available.\n\n")
+                result_text.insert(tk.END, " Data not available.\n\n")
                 continue
 
             focal = data.get('focal_efectiva', 0)
@@ -130,7 +130,7 @@ def open_auto_mode_window(root):
         except ValueError:
             result_text.configure(state='normal')
             result_text.delete(1.0, tk.END)
-            result_text.insert(tk.END, "⚠️ Invalid input.\n")
+            result_text.insert(tk.END, "Invalid input.\n")
             result_text.configure(state='disabled')
 
     # Save measurement data

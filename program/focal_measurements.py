@@ -15,9 +15,9 @@ from camara import capture_image_array
 from communication import read_current_position
 #from utils import mm_to_steps
 
-# === CONFIGURACIONES ===
+# === CONFIGURATIONS ===
 
-# === ESPERA HASTA QUE EL MOTOR LLEGUE A DESTINO ===
+# === WAITS UNTIL MOTOR IS ON DESIRED POSITION ===
 def desired_position(target_position):
     while True:
         current = read_current_position()
@@ -94,7 +94,7 @@ def compute_distances_to_center(img, threshold_method='otsu', fixed_threshold_va
     return np.array(distances)
 
 
-# Folder for data
+# --- Folder for store reference data
 
 DATA_FOLDER = Path(external_folder("data"))
 REFERENCE_FOLDER = DATA_FOLDER / "reference"
@@ -148,7 +148,7 @@ def do_reference():
     # --- Save vector reference distances
     np.save(REFERENCE_PATH, np.array(y0))
 
-    # --- Turn of led and activate filter w
+    # --- Turn off led and activate filter w
     led_off()
     activate_filter('w')
 
