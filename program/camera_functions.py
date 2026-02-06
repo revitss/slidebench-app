@@ -46,6 +46,7 @@ def create_daily_folder():
     return day_folder
 
 
+
 def add_grid(img, grid_type="both"):
     """Add a grid overlay to an image for alignment assistance."""
     img = img.copy()
