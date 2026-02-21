@@ -2,3 +2,5 @@
 media/
 data/
 program/__pycache__/
+image_processing.ipynb
+.ipynb_checkpoints/
