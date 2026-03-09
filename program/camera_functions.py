@@ -143,8 +143,8 @@ def save_current_photo(btn_save_photo):
     day_folder = create_daily_folder()
     timestamp = time.strftime("%H%M%S")
     default_name = f"photo_{timestamp}.jpg"
-    custom_name = simpledialog.askstring("Save Photo", "Custom name?\n(Do not include .jpg)")
-    filename = (custom_name + ".jpg") if custom_name else default_name
+    custom_name = simpledialog.askstring("Save Photo", "Custom name?\n(Do not include .png)")
+    filename = (custom_name + ".png") if custom_name else default_name
     destination = os.path.join(day_folder, filename)
     try:
         last_preview_image.save(destination)

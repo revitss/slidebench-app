@@ -18,6 +18,8 @@ from automatic_gui import open_auto_mode_window
 # import camera_functions
 from utils import resource_path
 
+
+
 def abrir_ventana_conexion():
     """
     Opens a small window to select and connect both:
@@ -210,7 +212,7 @@ def iniciar_interfaz():
     
     btn_go.grid(row=9, column=0, columnspan=2, pady=5)
     
-    # --- [POSICIÓN ACTUAL EN mm: VISOR DIGITAL] ---
+    # --- [DIGITAL VISOR] ---
     posicion_display = tk.Label(
         motor_frame,
         text="000.00 mm",

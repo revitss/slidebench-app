@@ -65,7 +65,7 @@ def move_to_position(mm):
     """
     try:
         #mm_value = float(entry.get())
-        mm_value = abs(mm)
+        mm_value = abs(float(mm))
         steps = mm_to_steps(mm_value)
 
         # Send the "go to" command (g = go to position)
