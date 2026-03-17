@@ -109,6 +109,180 @@ def seleccionar_filtro(filtro, boton, todos_los_botones):
         b.config(bg="SystemButtonFace")
     boton.config(bg=color)
 
+def build_camera_view(parent, font, no_camera_tk, no_photo_tk):
+    camera_frame = tk.LabelFrame(parent, text="Live Camera View", font=font, padx=10, pady=10)
+    camera_frame.grid(row=0, column=2, sticky="n", padx=10, pady=10)
+    camera_frame.columnconfigure(0, weight=1)
+    camera_label = tk.Label(camera_frame, image=no_camera_tk, bd=2, relief="groove", bg="black")
+    camera_label.grid(row=0, column=0, padx=1, pady=1)
+    last_photo_label = tk.Label(camera_frame, image=no_photo_tk, bd=2, relief="groove", bg="black")
+    last_photo_label.grid(row=1, column=0, padx=5, pady=10)
+    
+    return camera_label, last_photo_label
+
+def build_camera_controls(parent, font, camera_label, last_photo_label):
+    btns_frame = tk.LabelFrame(parent, text="Camera Controls", font=font, padx=10, pady=10)
+    btns_frame.grid(row=0, column=1, sticky="n", padx=10, pady=10)
+    
+    btn_toggle_camera = tk.Button(btns_frame, text="Activate Camera", width=20, height=2)
+    btn_toggle_camera.grid(row=0, column=0, padx=5, pady=5)
+    
+    btn_photo = tk.Button(btns_frame, text="Capture Image", width=20, height=2)
+    btn_photo.grid(row=1, column=0, padx=5, pady=5)
+    
+    btn_record = tk.Button(btns_frame, text="Start/Stop Recording", width=20, height=2)
+    btn_record.grid(row=2, column=0, padx=5, pady=5)
+    
+    def select_folder():
+        folder = filedialog.askdirectory()
+        if folder:
+            set_save_folder(folder)
+            
+    btn_folder = tk.Button(btns_frame, text="Select Folder", width=20, height=2, command=select_folder)
+    btn_folder.grid(row=3, column=0, padx=5, pady=5)
+    
+    btn_show_photo = tk.Button(btns_frame, text="Open Image", width=20, height=2, command=lambda: update_photo_display(last_photo_label, filedialog.askopenfilename(
+                                   title='Select Image', filetypes=[('Image files', '*.jpg *.jpeg *.png *.bmp')])))
+    btn_show_photo.grid(row=4, column=0, padx=5, pady=5)
+    
+    btn_save_photo = tk.Button(btns_frame, text="Save Photo", width=20, height=2, command=lambda: save_current_photo(btn_save_photo))
+    btn_save_photo.grid(row=5, column=0, padx=5, pady=5)
+    btn_save_photo.grid_remove()
+
+    # TODO: assign functionality before release
+    btn_test = tk.Button(btns_frame, text="Test Button", width=20, height=2, command=lambda: print("Test button clicked"))
+    btn_test.grid(row=8, column=0, padx=5, pady=(50,0))
+    
+    # --- Cargar imagen ---
+    img_path = resource_path(os.path.join("resources", "points.png"))
+    img = Image.open(img_path).resize((200, 200))    # Ruta de la imagen Tamaño deseado (ancho, alto) en píxeles
+    photo = ImageTk.PhotoImage(img) # Convertir para Tkinter
+
+    # --- Crear Label para mostrarla ---
+    img_label = tk.Label(btns_frame, image=photo)
+    img_label.grid(row=9, column=0, pady=10)  # Coloca debajo del último botón
+    img_label.image = photo  # IMPORTANTE: mantener referencia para que no desaparezca
+    
+    btn_toggle_camera.config(command=lambda: toggle_camera(camera_label, btn_toggle_camera))
+    btn_photo.config(command=lambda: take_photo(camera_label, last_photo_label, btn_save_photo))
+    btn_record.config(command=lambda: toggle_recording(btn_record))
+    
+    return btn_save_photo
+
+def build_controller(parent, font, root):
+    # --- [MOTOR CONTROL] ---
+    motor_frame = tk.LabelFrame(parent, text="Device Control", font=font, padx=10, pady=10)
+    motor_frame.grid(row=0, column=0, sticky="n", padx=10, pady=10)
+
+    btn_left = tk.Button(motor_frame, text="◀ Back (Left)", font=("Arial", 14))
+    btn_right = tk.Button(motor_frame, text="▶ Forward (Right)", font=("Arial", 14))
+    btn_left.bind("<ButtonPress>", move_left)
+    btn_left.bind("<ButtonRelease>", stop_motor)
+    btn_right.bind("<ButtonPress>", move_right)
+    btn_right.bind("<ButtonRelease>", stop_motor)
+    btn_left.grid(row=0, column=0, padx=5, pady=5)
+    btn_right.grid(row=0, column=1, padx=5, pady=5)
+
+    tk.Label(motor_frame, text="Speed:", font=font).grid(row=1, column=0, columnspan=2)
+    speed_slider = tk.Scale(motor_frame, from_=1, to=10, orient=tk.HORIZONTAL, length=300, tickinterval=1, command=set_speed)
+    speed_slider.set(5)
+    speed_slider.grid(row=2, column=0, columnspan=2, padx=5, pady=5)
+
+    tk.Label(motor_frame, text="Distance to move (mm):", font=font).grid(row=3, column=0, columnspan=2)
+    mm_entry = tk.Entry(motor_frame, width=15)
+    mm_entry.grid(row=4, column=0, columnspan=2, pady=5)
+
+    direction = tk.StringVar(value="f")
+    radio_frame = tk.Frame(motor_frame)
+    radio_frame.grid(row=5, column=0, columnspan=2)
+    tk.Radiobutton(radio_frame, text="Forward", variable=direction, value="f", font=font).pack(side="left")
+    tk.Radiobutton(radio_frame, text="Backward", variable=direction, value="b", font=font).pack(side="left")
+    
+    mm_entry.bind("<Return>", lambda event: [move_motor(mm_entry.get(), direction.get()), mm_entry.master.focus_set()])
+    btn_move = tk.Button(motor_frame, 
+                         text="Move", 
+                         width=20, 
+                         height=2, 
+                         command=lambda: [move_motor(mm_entry.get(), direction.get()), mm_entry.master.focus_set()])
+
+    btn_move.grid(row=6, column=0, columnspan=2, pady=10)
+
+
+    # --- [GO TO ABSOLUTE POSITION] ---
+    tk.Label(motor_frame, text="Go to position (mm):", font=font).grid(row=7, column=0, columnspan=2)
+    go_entry = tk.Entry(motor_frame, width=15)
+    go_entry.grid(row=8, column=0, columnspan=2, pady=5)
+    
+    go_entry.bind("<Return>", lambda event: [move_to_position(go_entry.get()), go_entry.master.focus_set()])
+    btn_go = tk.Button(motor_frame, 
+                       text="Go", 
+                       width=20, 
+                       command=lambda: [move_to_position(go_entry.get()), go_entry.master.focus_set()])
+    
+    btn_go.grid(row=9, column=0, columnspan=2, pady=5)
+    
+    # --- [DIGITAL VISOR] ---
+    posicion_display = tk.Label(
+        motor_frame,
+        text="000.00 mm",
+        font=("Courier", 20, "bold"),  
+        fg="#FF3C3C",     
+        bg="#1A1A1A",     
+        width=10,
+        relief="sunken",
+        bd=6
+    )
+    posicion_display.grid(row=10, column=0, columnspan=2, pady=(10, 5))
+    
+    # --- [LED CONTROL] ---
+    tk.Label(motor_frame, text="Light Source Control", font=font).grid(row=11, column=0, columnspan=2, pady=(10, 0))
+
+    default_btn_color = root.cget("bg")
+
+    def toggle_light(state):
+        if state == "on":
+            led_on()
+            intensidad_actual = led_slider.get()
+            led_intensity(intensidad_actual)
+            btn_light_on.config(bg="#BCBCBC", fg="black")
+            btn_light_off.config(bg=default_btn_color, fg="black")
+        elif state == "off":
+            led_off()
+            btn_light_off.config(bg="#BCBCBC", fg="black")
+            btn_light_on.config(bg=default_btn_color, fg="black")
+
+
+    btn_light_on = tk.Button(motor_frame, text="Turn On", width=15, command=lambda: toggle_light("on"))
+    btn_light_off = tk.Button(motor_frame, text="Turn Off", width=15, command=lambda: toggle_light("off"))
+
+    btn_light_on.grid(row=12, column=0, pady=5)
+    btn_light_off.grid(row=12, column=1, pady=5)
+
+    tk.Label(motor_frame, text="Intensity:", font=font).grid(row=13, column=0, columnspan=2)
+    led_slider = tk.Scale(motor_frame, from_=1, to=10, orient=tk.HORIZONTAL, length=300, tickinterval=1,
+                        command=lambda val: send_command(f"led{val}"))
+    led_slider.set(5)
+    led_slider.grid(row=14, column=0, columnspan=2, padx=5, pady=5)
+
+
+    # --- [FILTER CONTROL] ---
+    tk.Label(motor_frame, text="Filters", font=font).grid(row=15, column=0, columnspan=2, pady=(10, 5))
+    filter_frame = tk.Frame(motor_frame)
+    filter_frame.grid(row=16, column=0, columnspan=2)
+    filtros = [("Red", "r"), ("Green", "g"), ("Blue", "b"), ("White", "w")]
+    botones_filtro = []
+    for nombre, clave in filtros:
+        btn = tk.Button(filter_frame, text=nombre, width=10)
+        btn.config(command=lambda c=clave, b=btn: seleccionar_filtro(c, b, botones_filtro))
+        btn.pack(side="left", padx=5)
+        botones_filtro.append(btn)
+        
+    # --- [OTHER WINDOW] ---        
+    btn_modo_auto = tk.Button(motor_frame, text="Automatic Mode", width=20, height=2, command=lambda: open_auto_mode_window(root))
+    btn_modo_auto.grid(row=18, column=0, columnspan=2, pady=10)
+    
+    return posicion_display
+
 def iniciar_interfaz():
     
     root = tk.Tk()
@@ -157,177 +331,10 @@ def iniciar_interfaz():
     main_frame.columnconfigure(1, weight=2)
     main_frame.columnconfigure(2, weight=1)
 
-    # --- [MOTOR CONTROL] ---
-    motor_frame = tk.LabelFrame(main_frame, text="Device Control", font=font_settings, padx=10, pady=10)
-    motor_frame.grid(row=0, column=0, sticky="n", padx=10, pady=10)
-
-    btn_left = tk.Button(motor_frame, text="◀ Back (Left)", font=("Arial", 14))
-    btn_right = tk.Button(motor_frame, text="▶ Forward (Right)", font=("Arial", 14))
-    btn_left.bind("<ButtonPress>", move_left)
-    btn_left.bind("<ButtonRelease>", stop_motor)
-    btn_right.bind("<ButtonPress>", move_right)
-    btn_right.bind("<ButtonRelease>", stop_motor)
-    btn_left.grid(row=0, column=0, padx=5, pady=5)
-    btn_right.grid(row=0, column=1, padx=5, pady=5)
-
-    tk.Label(motor_frame, text="Speed:", font=font_settings).grid(row=1, column=0, columnspan=2)
-    speed_slider = tk.Scale(motor_frame, from_=1, to=10, orient=tk.HORIZONTAL, length=300, tickinterval=1, command=set_speed)
-    speed_slider.set(5)
-    speed_slider.grid(row=2, column=0, columnspan=2, padx=5, pady=5)
-
-    tk.Label(motor_frame, text="Distance to move (mm):", font=font_settings).grid(row=3, column=0, columnspan=2)
-    mm_entry = tk.Entry(motor_frame, width=15)
-    mm_entry.grid(row=4, column=0, columnspan=2, pady=5)
-
-    direction = tk.StringVar(value="f")
-    radio_frame = tk.Frame(motor_frame)
-    radio_frame.grid(row=5, column=0, columnspan=2)
-    tk.Radiobutton(radio_frame, text="Forward", variable=direction, value="f", font=font_settings).pack(side="left")
-    tk.Radiobutton(radio_frame, text="Backward", variable=direction, value="b", font=font_settings).pack(side="left")
+    position_display = build_controller(main_frame, font_settings, root)
+    camera_label, last_photo_label = build_camera_view(main_frame, font_settings, no_camera_tk, no_photo_tk)
+    btn_save_photo = build_camera_controls(main_frame, font_settings, camera_label, last_photo_label)
     
-    mm_entry.bind("<Return>", lambda event: [move_motor(mm_entry.get(), direction.get()), mm_entry.master.focus_set()])
-    btn_move = tk.Button(motor_frame, 
-                         text="Move", 
-                         width=20, 
-                         height=2, 
-                         command=lambda: [move_motor(mm_entry.get(), direction.get()), mm_entry.master.focus_set()])
-
-    btn_move.grid(row=6, column=0, columnspan=2, pady=10)
-
-
-    # --- [GO TO ABSOLUTE POSITION] ---
-    tk.Label(motor_frame, text="Go to position (mm):", font=font_settings).grid(row=7, column=0, columnspan=2)
-    go_entry = tk.Entry(motor_frame, width=15)
-    go_entry.grid(row=8, column=0, columnspan=2, pady=5)
-    
-    go_entry.bind("<Return>", lambda event: [move_to_position(go_entry.get()), go_entry.master.focus_set()])
-    btn_go = tk.Button(motor_frame, 
-                       text="Go", 
-                       width=20, 
-                       command=lambda: [move_to_position(go_entry.get()), go_entry.master.focus_set()])
-    
-    btn_go.grid(row=9, column=0, columnspan=2, pady=5)
-    
-    # --- [DIGITAL VISOR] ---
-    posicion_display = tk.Label(
-        motor_frame,
-        text="000.00 mm",
-        font=("Courier", 20, "bold"),  
-        fg="#FF3C3C",     
-        bg="#1A1A1A",     
-        width=10,
-        relief="sunken",
-        bd=6
-    )
-    posicion_display.grid(row=10, column=0, columnspan=2, pady=(10, 5))
-    
-    # --- [LED CONTROL] ---
-    tk.Label(motor_frame, text="Light Source Control", font=font_settings).grid(row=11, column=0, columnspan=2, pady=(10, 0))
-
-    default_btn_color = root.cget("bg")
-
-    def toggle_light(state):
-        if state == "on":
-            led_on()
-            intensidad_actual = led_slider.get()
-            led_intensity(intensidad_actual)
-            btn_light_on.config(bg="#BCBCBC", fg="black")
-            btn_light_off.config(bg=default_btn_color, fg="black")
-        elif state == "off":
-            led_off()
-            btn_light_off.config(bg="#BCBCBC", fg="black")
-            btn_light_on.config(bg=default_btn_color, fg="black")
-
-
-    btn_light_on = tk.Button(motor_frame, text="Turn On", width=15, command=lambda: toggle_light("on"))
-    btn_light_off = tk.Button(motor_frame, text="Turn Off", width=15, command=lambda: toggle_light("off"))
-
-    btn_light_on.grid(row=12, column=0, pady=5)
-    btn_light_off.grid(row=12, column=1, pady=5)
-
-    tk.Label(motor_frame, text="Intensity:", font=font_settings).grid(row=13, column=0, columnspan=2)
-    led_slider = tk.Scale(motor_frame, from_=1, to=10, orient=tk.HORIZONTAL, length=300, tickinterval=1,
-                        command=lambda val: send_command(f"led{val}"))
-    led_slider.set(5)
-    led_slider.grid(row=14, column=0, columnspan=2, padx=5, pady=5)
-
-
-    # --- [FILTER CONTROL] ---
-    tk.Label(motor_frame, text="Filters", font=font_settings).grid(row=15, column=0, columnspan=2, pady=(10, 5))
-    filter_frame = tk.Frame(motor_frame)
-    filter_frame.grid(row=16, column=0, columnspan=2)
-    filtros = [("Red", "r"), ("Green", "g"), ("Blue", "b"), ("White", "w")]
-    botones_filtro = []
-    for nombre, clave in filtros:
-        btn = tk.Button(filter_frame, text=nombre, width=10)
-        btn.config(command=lambda c=clave, b=btn: seleccionar_filtro(c, b, botones_filtro))
-        btn.pack(side="left", padx=5)
-        botones_filtro.append(btn)
-        
-    # --- [OTHER WINDOW] ---        
-    btn_modo_auto = tk.Button(motor_frame, text="Automatic Mode", width=20, height=2, command=lambda: open_auto_mode_window(root))
-    btn_modo_auto.grid(row=18, column=0, columnspan=2, pady=10)
-
-    # --- [CAMERA CONTROLS] ---
-    btns_frame = tk.LabelFrame(main_frame, text="Camera Controls", font=font_settings, padx=10, pady=10)
-    btns_frame.grid(row=0, column=1, sticky="n", padx=10, pady=10)
-    
-    btn_toggle_camera = tk.Button(btns_frame, text="Activate Camera", width=20, height=2)
-    btn_toggle_camera.grid(row=0, column=0, padx=5, pady=5)
-    
-    btn_photo = tk.Button(btns_frame, text="Capture Image", width=20, height=2)
-    btn_photo.grid(row=1, column=0, padx=5, pady=5)
-    
-    btn_record = tk.Button(btns_frame, text="Start/Stop Recording", width=20, height=2)
-    btn_record.grid(row=2, column=0, padx=5, pady=5)
-    
-    def select_folder():
-        folder = filedialog.askdirectory()
-        if folder:
-            set_save_folder(folder)
-            
-    btn_folder = tk.Button(btns_frame, text="Select Folder", width=20, height=2, command=select_folder)
-    btn_folder.grid(row=3, column=0, padx=5, pady=5)
-    
-    btn_show_photo = tk.Button(btns_frame, text="Open Image", width=20, height=2, command=lambda: update_photo_display(last_photo_label, filedialog.askopenfilename(
-                                   title='Select Image', filetypes=[('Image files', '*.jpg *.jpeg *.png *.bmp')])))
-    btn_show_photo.grid(row=4, column=0, padx=5, pady=5)
-    
-    btn_save_photo = tk.Button(btns_frame, text="Save Photo", width=20, height=2, command=lambda: save_current_photo(btn_save_photo))
-    btn_save_photo.grid(row=5, column=0, padx=5, pady=5)
-    btn_save_photo.grid_remove()
-
-    # TODO: assign functionality before release
-    btn_test = tk.Button(btns_frame, text="Test Button", width=20, height=2, command=lambda: print("Test button clicked"))
-    btn_test.grid(row=8, column=0, padx=5, pady=(50,0))
-    
-    # --- Cargar imagen ---
-    img_path = resource_path(os.path.join("resources", "points.png"))
-    img = Image.open(img_path).resize((200, 200))    # Ruta de la imagen Tamaño deseado (ancho, alto) en píxeles
-    photo = ImageTk.PhotoImage(img) # Convertir para Tkinter
-
-    # --- Crear Label para mostrarla ---
-    img_label = tk.Label(btns_frame, image=photo)
-    img_label.grid(row=9, column=0, pady=10)  # Coloca debajo del último botón
-    img_label.image = photo  # IMPORTANTE: mantener referencia para que no desaparezca
-    
-    
-    
-    
-    
-
-    # --- [CAMERA VIEW] ---
-    camera_frame = tk.LabelFrame(main_frame, text="Live Camera View", font=font_settings, padx=10, pady=10)
-    camera_frame.grid(row=0, column=2, sticky="n", padx=10, pady=10)
-    camera_frame.columnconfigure(0, weight=1)
-    camera_label = tk.Label(camera_frame, image=no_camera_tk, bd=2, relief="groove", bg="black")
-    camera_label.grid(row=0, column=0, padx=1, pady=1)
-    last_photo_label = tk.Label(camera_frame, image=no_photo_tk, bd=2, relief="groove", bg="black")
-    last_photo_label.grid(row=1, column=0, padx=5, pady=10)
-
-    btn_toggle_camera.config(command=lambda: toggle_camera(camera_label, btn_toggle_camera))
-    btn_photo.config(command=lambda: take_photo(camera_label, last_photo_label, btn_save_photo))
-    btn_record.config(command=lambda: toggle_recording(btn_record))
         
     def on_closing():
         led_off()
@@ -340,12 +347,11 @@ def iniciar_interfaz():
         if arduino and arduino.is_open: 
             arduino.close()
         root.destroy()
-
         
     def actualizar_posicion():
         mm = read_current_position()
         if mm is not None:
-            posicion_display.config(text=f"{mm:.2f} mm") 
+            position_display.config(text=f"{mm:.2f} mm") 
         root.after(50, actualizar_posicion)
 
     root.protocol("WM_DELETE_WINDOW", on_closing)
