@@ -1,26 +1,22 @@
+import os
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
 
-from controller import (
-    move_left, move_right, stop_motor, set_speed, move_motor, move_to_position,
-    activate_filter, led_on, led_off, led_intensity
-)
-from communication import (
-    send_command, read_current_position, arduino, refresh_ports, connect_arduino
-)
-from camera_functions import (
-    cap, recording, video_writer, set_camera_index, toggle_camera, take_photo, save_current_photo,
-    toggle_recording, update_photo_display, refresh_cameras
-)
+from controller import (move_left, move_right, stop_motor, set_speed, move_motor, move_to_position,
+    activate_filter, led_on, led_off, led_intensity)
+from communication import (send_command, read_current_position, arduino, refresh_ports, connect_arduino)
+from camera_functions import (set_camera_index, toggle_camera, take_photo, set_save_folder, save_current_photo,
+    toggle_recording, update_photo_display, refresh_cameras)
+import camera_functions
+
 from automatic_gui import open_auto_mode_window
 # import camera_functions
 from utils import resource_path
 
 
-
-def abrir_ventana_conexion():
+def open_window_conexion():
     """
     Opens a small window to select and connect both:
       - Arduino COM port
@@ -128,8 +124,8 @@ def iniciar_interfaz():
 
     font_settings = ("Helvetica", 12, "bold")
     
-    image_default = resource_path("resources\\image.png")
-    image1_default = resource_path("resources\\image1.png")
+    image_default = resource_path(os.path.join("resources", "image.png"))
+    image1_default = resource_path(os.path.join("resources", "image1.png"))
 
     no_camera_img = Image.open(image_default).resize((400, 400))
     no_photo_img = Image.open(image1_default).resize((400, 400))
@@ -275,31 +271,38 @@ def iniciar_interfaz():
     # --- [CAMERA CONTROLS] ---
     btns_frame = tk.LabelFrame(main_frame, text="Camera Controls", font=font_settings, padx=10, pady=10)
     btns_frame.grid(row=0, column=1, sticky="n", padx=10, pady=10)
+    
     btn_toggle_camera = tk.Button(btns_frame, text="Activate Camera", width=20, height=2)
     btn_toggle_camera.grid(row=0, column=0, padx=5, pady=5)
+    
     btn_photo = tk.Button(btns_frame, text="Capture Image", width=20, height=2)
     btn_photo.grid(row=1, column=0, padx=5, pady=5)
+    
     btn_record = tk.Button(btns_frame, text="Start/Stop Recording", width=20, height=2)
     btn_record.grid(row=2, column=0, padx=5, pady=5)
-    btn_folder = tk.Button(btns_frame, text="Select Folder", width=20, height=2,
-                           command=lambda: filedialog.askdirectory())
+    
+    def select_folder():
+        folder = filedialog.askdirectory()
+        if folder:
+            set_save_folder(folder)
+            
+    btn_folder = tk.Button(btns_frame, text="Select Folder", width=20, height=2, command=select_folder)
     btn_folder.grid(row=3, column=0, padx=5, pady=5)
-    btn_show_photo = tk.Button(btns_frame, text="Open Image", width=20, height=2,
-                               command=lambda: update_photo_display(last_photo_label, filedialog.askopenfilename(
+    
+    btn_show_photo = tk.Button(btns_frame, text="Open Image", width=20, height=2, command=lambda: update_photo_display(last_photo_label, filedialog.askopenfilename(
                                    title='Select Image', filetypes=[('Image files', '*.jpg *.jpeg *.png *.bmp')])))
     btn_show_photo.grid(row=4, column=0, padx=5, pady=5)
-    btn_save_photo = tk.Button(btns_frame, text="Save Photo", width=20, height=2,
-                               command=lambda: save_current_photo(btn_save_photo))
+    
+    btn_save_photo = tk.Button(btns_frame, text="Save Photo", width=20, height=2, command=lambda: save_current_photo(btn_save_photo))
     btn_save_photo.grid(row=5, column=0, padx=5, pady=5)
     btn_save_photo.grid_remove()
 
-    
-    btn_test = tk.Button(btns_frame, text="Test Button", width=20, height=2,
-                     command=lambda: print("Test button clicked"))
+    # TODO: assign functionality before release
+    btn_test = tk.Button(btns_frame, text="Test Button", width=20, height=2, command=lambda: print("Test button clicked"))
     btn_test.grid(row=8, column=0, padx=5, pady=(50,0))
     
     # --- Cargar imagen ---
-    img_path = resource_path("resources\\points.png")
+    img_path = resource_path(os.path.join("resources", "points.png"))
     img = Image.open(img_path).resize((200, 200))    # Ruta de la imagen Tamaño deseado (ancho, alto) en píxeles
     photo = ImageTk.PhotoImage(img) # Convertir para Tkinter
 
@@ -325,15 +328,17 @@ def iniciar_interfaz():
     btn_toggle_camera.config(command=lambda: toggle_camera(camera_label, btn_toggle_camera))
     btn_photo.config(command=lambda: take_photo(camera_label, last_photo_label, btn_save_photo))
     btn_record.config(command=lambda: toggle_recording(btn_record))
-
+        
     def on_closing():
         led_off()
-        
-        # from camera_functions import cap, recording, video_writer
-        if cap: cap.release()
-        if recording and video_writer: video_writer.release()
-        
-        if arduino and arduino.is_open: arduino.close()
+    
+        if camera_functions.cap: 
+            camera_functions.cap.release()
+        if camera_functions.recording and camera_functions.video_writer: 
+            camera_functions.video_writer.release()
+    
+        if arduino and arduino.is_open: 
+            arduino.close()
         root.destroy()
 
         

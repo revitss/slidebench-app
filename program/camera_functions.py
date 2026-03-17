@@ -2,7 +2,7 @@ import cv2
 import os
 import time
 import threading
-from tkinter import simpledialog
+from tkinter import simpledialog, messagebox
 from PIL import Image, ImageTk
 import numpy as np
 from pygrabber.dshow_graph import FilterGraph
@@ -132,24 +132,27 @@ def take_photo(camera_label, last_photo_label, btn_save_photo):
 
         btn_save_photo.grid()
 
+def set_save_folder(path):
+    global save_folder
+    save_folder = path
 
 def save_current_photo(btn_save_photo):
     """Saves the last captured photo to disk."""
     global last_preview_image, photo_path
     if last_preview_image is None:
-        print("No photo to save.")
+        messagebox.showwarning("Error", f"No image to save.")
         return
 
     day_folder = create_daily_folder()
     timestamp = time.strftime("%H%M%S")
-    default_name = f"photo_{timestamp}.jpg"
-    custom_name = simpledialog.askstring("Save Photo", "Custom name?\n(Do not include .png)")
+    default_name = f"img_{timestamp}.png"
+    custom_name = simpledialog.askstring("Save Image", "Custom name?\n(Do not include .png)")
     filename = (custom_name + ".png") if custom_name else default_name
     destination = os.path.join(day_folder, filename)
     try:
         last_preview_image.save(destination)
         photo_path = destination
-        print(f"📸 Photo saved as {filename} in {day_folder}")
+        messagebox.showwarning("Saving succed", f"Photo saved as {filename} in {day_folder}")
         btn_save_photo.grid_remove()
     except Exception as e:
         print(f"Error saving photo: {e}")
