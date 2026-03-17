@@ -10,9 +10,7 @@ from communication import (send_command, read_current_position, arduino, refresh
 from camera_functions import (set_camera_index, toggle_camera, take_photo, set_save_folder, save_current_photo,
     toggle_recording, update_photo_display, refresh_cameras)
 import camera_functions
-
 from automatic_gui import open_auto_mode_window
-# import camera_functions
 from utils import resource_path
 
 
@@ -91,7 +89,7 @@ def open_window_conexion():
         # Try to connect Arduino
         if connect_arduino(selected_port):
             win.destroy()
-            iniciar_interfaz()
+            start_interface()
         else:
             messagebox.showerror("Connection Error", "Failed to connect to Arduino.")
 
@@ -102,10 +100,9 @@ def open_window_conexion():
     refresh()  # Load ports when window opens
     win.mainloop()
 
-
-def seleccionar_filtro(filtro, boton, todos_los_botones):
-    color = activate_filter(filtro)
-    for b in todos_los_botones:
+def select_filter(filter, boton, all_buttons):
+    color = activate_filter(filter)
+    for b in all_buttons:
         b.config(bg="SystemButtonFace")
     boton.config(bg=color)
 
@@ -269,13 +266,13 @@ def build_controller(parent, font, root):
     tk.Label(motor_frame, text="Filters", font=font).grid(row=15, column=0, columnspan=2, pady=(10, 5))
     filter_frame = tk.Frame(motor_frame)
     filter_frame.grid(row=16, column=0, columnspan=2)
-    filtros = [("Red", "r"), ("Green", "g"), ("Blue", "b"), ("White", "w")]
-    botones_filtro = []
-    for nombre, clave in filtros:
-        btn = tk.Button(filter_frame, text=nombre, width=10)
-        btn.config(command=lambda c=clave, b=btn: seleccionar_filtro(c, b, botones_filtro))
+    filters = [("Red", "r"), ("Green", "g"), ("Blue", "b"), ("White", "w")]
+    filter_buttons = []
+    for name, key in filters:
+        btn = tk.Button(filter_frame, text=name, width=10)
+        btn.config(command=lambda c=key, b=btn: select_filter(c, b, filter_buttons))
         btn.pack(side="left", padx=5)
-        botones_filtro.append(btn)
+        filter_buttons.append(btn)
         
     # --- [OTHER WINDOW] ---        
     btn_modo_auto = tk.Button(motor_frame, text="Automatic Mode", width=20, height=2, command=lambda: open_auto_mode_window(root))
@@ -283,7 +280,7 @@ def build_controller(parent, font, root):
     
     return posicion_display
 
-def iniciar_interfaz():
+def start_interface():
     
     root = tk.Tk()
     root.title("Slidebench Control")
@@ -333,7 +330,7 @@ def iniciar_interfaz():
 
     position_display = build_controller(main_frame, font_settings, root)
     camera_label, last_photo_label = build_camera_view(main_frame, font_settings, no_camera_tk, no_photo_tk)
-    btn_save_photo = build_camera_controls(main_frame, font_settings, camera_label, last_photo_label)
+    build_camera_controls(main_frame, font_settings, camera_label, last_photo_label)
     
         
     def on_closing():
@@ -348,12 +345,12 @@ def iniciar_interfaz():
             arduino.close()
         root.destroy()
         
-    def actualizar_posicion():
+    def update_position():
         mm = read_current_position()
         if mm is not None:
             position_display.config(text=f"{mm:.2f} mm") 
-        root.after(50, actualizar_posicion)
+        root.after(50, update_position)
 
     root.protocol("WM_DELETE_WINDOW", on_closing)
-    actualizar_posicion()
+    update_position()
     root.mainloop()
