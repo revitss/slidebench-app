@@ -51,53 +51,6 @@ def desired_position(target_position):
         # Wait 100ms before checking again to avoid hammering the serial port
         time.sleep(0.1)
 
-
-def format_distances(distances):
-    """
-    Formats the 8 computed distances into a human readable string
-    showing which blob points are being measured relative to the center.
-
-    The 9 blobs are arranged in a 3x3 grid numbered 1-9:
-        1 | 2 | 3
-        ---------
-        4 | 5 | 6
-        ---------
-        7 | 8 | 9
-
-    Point 5 is always the center. The 8 distances are split into two
-    groups (p and l) which correspond to the two sets of measurement
-    points used in the focal length calculation.
-
-    Parameters
-    ----------
-    distances : numpy array
-        Array of 8 distances in pixels computed by compute_distances_to_center().
-
-    Returns
-    -------
-    str
-        A formatted string showing each point pair and its distance.
-    """
-    # p points: the 4 distances used for the p measurement
-    # Each tuple is (point_a, center_point, index_in_distances_array)
-    p_map = [(6,5,4), (2,5,1), (4,5,3), (8,5,6)]
-    # l points: the 4 distances used for the l measurement
-    l_map = [(3,5,2), (1,5,0), (7,5,5), (9,5,7)]
-
-    # Build the formatted string for p points
-    text = "p points:\n"
-    for i, (a, c, idx) in enumerate(p_map):
-        # Format: "  1: 6─5  12.34 px"
-        text += f"  {i+1}: {a}─{c}  {distances[idx]} px\n"
-
-    # Build the formatted string for l points
-    text += "\nl points:\n"
-    for i, (a, c, idx) in enumerate(l_map):
-        text += f"  {i+1}: {a}─{c}  {distances[idx]} px\n"
-
-    return text
-
-
 def compute_distances_to_center(img):
     """
     Analyzes an image to find 9 blob points arranged in a 3x3 grid
@@ -672,3 +625,48 @@ def save_measurement_data(images_z1, images_z2, tables, path_base, z1, z2):
     with pd.ExcelWriter(excel_path) as writer:
         for flt, tabla in tables.items():
             tabla.to_excel(writer, sheet_name=f"Filter_{flt.upper()}", index=False)
+            
+def format_distances(distances):
+    """
+    Formats the 8 computed distances into a human readable string
+    showing which blob points are being measured relative to the center.
+
+    The 9 blobs are arranged in a 3x3 grid numbered 1-9:
+        1 | 2 | 3
+        ---------
+        4 | 5 | 6
+        ---------
+        7 | 8 | 9
+
+    Point 5 is always the center. The 8 distances are split into two
+    groups (p and l) which correspond to the two sets of measurement
+    points used in the focal length calculation.
+
+    Parameters
+    ----------
+    distances : numpy array
+        Array of 8 distances in pixels computed by compute_distances_to_center().
+
+    Returns
+    -------
+    str
+        A formatted string showing each point pair and its distance.
+    """
+    # p points: the 4 distances used for the p measurement
+    # Each tuple is (point_a, center_point, index_in_distances_array)
+    p_map = [(6,5,4), (2,5,1), (4,5,3), (8,5,6)]
+    # l points: the 4 distances used for the l measurement
+    l_map = [(3,5,2), (1,5,0), (7,5,5), (9,5,7)]
+
+    # Build the formatted string for p points
+    text = "p points:\n"
+    for i, (a, c, idx) in enumerate(p_map):
+        # Format: "  1: 6─5  12.34 px"
+        text += f"  {i+1}: {a}─{c}  {distances[idx]} px\n"
+
+    # Build the formatted string for l points
+    text += "\nl points:\n"
+    for i, (a, c, idx) in enumerate(l_map):
+        text += f"  {i+1}: {a}─{c}  {distances[idx]} px\n"
+
+    return text            
