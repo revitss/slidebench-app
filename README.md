@@ -28,8 +28,23 @@ To use SlideBench you will need the following hardware:
 - **Servomotor** — controls the optical filter wheel
 - **LED light source** — illuminates the spot pattern screen
 - **USB camera** — captures images of the spot pattern
-- A circuit diagram of the device is available in the repository
+- A circuit diagram of the device is available in the repository in the `stepper/` folder
  
+---
+
+## Arduino Code
+
+The Arduino sketch that controls the motor, LED and filter wheel is available 
+in the `stepper/` folder of this repository. You will need to flash it to your 
+Arduino Uno before using the device.
+
+To flash the sketch:
+1. Download and install the [Arduino IDE](https://www.arduino.cc/en/software)
+2. Open the sketch file from the `stepper/` folder
+3. Connect your Arduino Uno via USB
+4. Select the correct port in the Arduino IDE
+5. Click **Upload**
+
 ---
  
 ## How to Install and Run
