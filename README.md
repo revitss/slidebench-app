@@ -149,4 +149,4 @@ This project does not currently have a license. Please contact the authors befor
 For questions or collaborations, please contact the Applied Optics Group at the Physics Department of the National University of Colombia.
 
 - **Yobani Mejía Barbosa** — ymejiab@unal.edu.co
-- **Kevin Perez** — kepere@unal.edu.co
+- **Kevin Perez** — keperez@unal.edu.co
