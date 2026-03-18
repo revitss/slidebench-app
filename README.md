@@ -38,7 +38,7 @@ To use SlideBench you will need the following hardware:
  
 > No Python installation required.
  
-1. Download `SlideBench.exe` from the [Releases](../../releases) page
+1. Download `SlideBench.exe` from the [Releases](https://github.com/revitss/slidebench-app/releases/tag/v1.0.0) page
 2. Place it in a folder of your choice
 3. Connect the Arduino and camera to your computer
 4. Double click `SlideBench.exe` to launch the application
