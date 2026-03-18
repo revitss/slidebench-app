@@ -4,3 +4,6 @@ data/
 program/__pycache__/
 image_processing.ipynb
 .ipynb_checkpoints/
+build/
+dist/
+SlideBench.spec
