@@ -90,6 +90,41 @@ pip install -r requirements.txt
 cd program
 python main.py
 ```
+
+## Data and Media Folders
+
+SlideBench manages two folders automatically — you do not need to create them manually.
+
+### `media/`
+This folder is where captured images and recorded videos are saved. When you launch
+SlideBench for the first time, it will create this folder automatically next to the
+executable. If the folder already exists from a previous session, the application will
+detect it and continue saving files there normally.
+
+### `data/`
+This folder stores the reference data and measurement results. It is created automatically
+next to the executable on first launch.
+
+Inside `data/` lives the `reference/` subfolder, which contains the reference file
+(`reference_y0.npy`) and the reference images for each filter. This reference data is
+essential for the focal length measurement — it represents the spot pattern distances
+captured without lens and is used as the baseline for all calculations.
+
+**First time using the app:**
+You must capture a reference measurement before running any automatic measurement.
+To do so, click **Capture Reference** in the Automatic Mode window, and the reference 
+file will be saved automatically in `data/reference/`. From that point on, the application 
+will read it automatically every time you run a measurement.
+
+**If you already have a reference file:**
+Simply place the `reference_y0.npy` file and the reference images inside the
+`data/reference/` folder next to the executable, and the application will detect
+and read them automatically — no need to capture a new reference.
+
+**⚠️ Important warning:**
+Always capture a new reference if you make any physical changes to the device,
+such as repositioning or replacing the spot pattern screen. Using an outdated
+reference file with a modified device will produce incorrect focal length results.
  
 ---
  
