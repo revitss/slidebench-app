@@ -28,19 +28,24 @@ To use SlideBench you will need the following hardware:
 - **Servomotor** — controls the optical filter wheel
 - **LED light source** — illuminates the spot pattern screen
 - **USB camera** — captures images of the spot pattern
-- A circuit diagram of the device is available in the repository in the `stepper/` folder
+- A circuit diagram of the device is available in the repository
  
 ---
 
 ## Arduino Code
 
-The Arduino sketch that controls the motor, LED and filter wheel is available 
-in the `stepper/` folder of this repository. You will need to flash it to your 
-Arduino Uno before using the device.
+The Arduino sketch that controls the motor, LED and filter wheel is available
+in the `arduino/` folder of this repository.
 
-To flash the sketch:
+**If you are using a device that has been used before:**
+The Arduino is likely already flashed with the correct sketch and no action is
+required — just connect it to your computer and launch the application.
+
+**If you are setting up a new device:**
+You will need to flash the Arduino sketch before using the device for the first time.
+To do so:
 1. Download and install the [Arduino IDE](https://www.arduino.cc/en/software)
-2. Open the sketch file from the `stepper/` folder
+2. Open the sketch file from the `arduino/` folder
 3. Connect your Arduino Uno via USB
 4. Select the correct port in the Arduino IDE
 5. Click **Upload**
@@ -142,7 +147,7 @@ The main window is divided into three sections:
 > Screenshots coming soon.
  
 ### Automatic Measurement Mode
-The automatic measurement window allows you to run a full focal length measurement automatically. You enter the two screen positions (z₁ and z₂ in mm), select the calculation mode that matches your optical setup, capture a reference image, and start the measurement. Results are displayed for each filter (white, red, green, blue) and can be saved to an Excel file.
+The automatic measurement window allows you to run a full focal length measurement automatically. You enter the two screen positions (z₁ and z₂ in mm), select the calculation mode that matches your optical setup, capture a reference image before if is needed, and start the measurement. Results are displayed for each filter (white, red, green, blue) and can be saved to an Excel file.
  
 > Screenshots coming soon.
  
@@ -199,4 +204,3 @@ This project does not currently have a license. Please contact the authors befor
 For questions or collaborations, please contact the Applied Optics Group at the Physics Department of the National University of Colombia.
 
 - **Yobani Mejía Barbosa** — ymejiab@unal.edu.co
-- **Kevin Perez** — keperez@unal.edu.co
