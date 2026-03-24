@@ -13,6 +13,7 @@ import camera_functions
 from automatic_gui import open_auto_mode_window
 from utils import resource_path
 from focal_measurements import compute_distances_to_center, format_distances
+from updater import check_for_updates
 import numpy as np
 
 
@@ -115,6 +116,11 @@ def open_window_conexion():
 
     # Automatically scan for ports and cameras when the window first opens
     refresh()
+    
+    # Check for updates when the app first opens
+    win.after(1000, check_for_updates)
+    win.mainloop()
+    
     # Start the Tkinter event loop for this window
     win.mainloop()
 

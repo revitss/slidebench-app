@@ -231,6 +231,7 @@ pyinstaller --onefile --windowed --name="SlideBench" --icon="program/resources/i
 --hidden-import pygrabber \
 --hidden-import sklearn \
 --hidden-import serial \
+--hidden-import requests \
 --add-data "program/resources;resources" \
 program/main.py
 """
