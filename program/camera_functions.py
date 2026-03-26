@@ -466,8 +466,8 @@ def capture_image_array():
     if ret:
         # Crop to the region of interest
         frame = frame[:, 420:1500, :]
-        # Flip vertically, horizontally and convert BGR to RGB
-        frame = frame[::-1, ::-1, ::-1]
+        # Flip vertically, horizontally, it's in BGR format
+        frame = frame[::-1, ::-1]
         return frame
     else:
         messagebox.showwarning("Error", "Failed to capture image in capture_image_array.")

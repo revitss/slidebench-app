@@ -51,7 +51,7 @@ def desired_position(target_position):
         # Wait 100ms before checking again to avoid hammering the serial port
         time.sleep(0.1)
 
-def compute_distances_to_center(img):
+def compute_distances_to_center(img, idx):
     """
     Analyzes an image to find 9 blob points arranged in a 3x3 grid
     and computes the distances from each of the 8 outer blobs to the
@@ -80,8 +80,15 @@ def compute_distances_to_center(img):
         Returns an array of zeros if detection fails.
     """
     # Convert to grayscale by averaging the three color channels equally
-    # This avoids bias towards any particular color channel
-    gray_img = np.mean(img, axis=2).astype(np.uint8)
+    
+    if idx == 0:
+        gray_img = np.mean(img, axis=2).astype(np.uint8)
+    elif idx == 1:
+        gray_img = img[:, :, 2]
+    elif idx == 2:
+        gray_img = img[:, :, 1]
+    elif idx == 3:  
+        gray_img = img[:, :, 0]
 
     # Binarize the grayscale image using Otsu's method
     # Otsu automatically finds the optimal threshold value
@@ -227,7 +234,7 @@ def do_reference():
             return
 
         # Compute the 8 blob distances for this image
-        distances = compute_distances_to_center(img)
+        distances = compute_distances_to_center(img, idx)
         if np.any(distances == 0):
             # If any distance is zero, the detection failed
             # Turn off the LED and reset filter before showing the error
@@ -278,7 +285,7 @@ def do_reference():
     )
 
 
-def focal_distance_with_table(y0, img1, img2, dz, modo=1):
+def focal_distance_with_table(y0, img1, img2, dz, idx, modo=1):
     """
     Computes the effective focal length from two images taken at different
     screen positions and a reference distance array.
@@ -316,8 +323,8 @@ def focal_distance_with_table(y0, img1, img2, dz, modo=1):
         final_table: pandas DataFrame with the full measurement table
     """
     # Compute the blob distances for both images
-    y1 = compute_distances_to_center(img1)
-    y2 = compute_distances_to_center(img2)
+    y1 = compute_distances_to_center(img1, idx)
+    y2 = compute_distances_to_center(img2, idx)
 
     # Define which distance indices belong to the p and l measurement groups
     # These correspond to specific blob positions in the 3x3 grid
@@ -504,7 +511,8 @@ def automatic_measurement(z1, z2, modo=1):
 
         # Initialize an array to store the 4 images at this position
         # Shape: (4 filters, height, width, 3 channels)
-        images_actual = np.zeros((4, 1080, 1080, 3))
+        # images_actual = np.zeros((4, 1080, 1080, 3))
+        images_actual = np.zeros((4, 1080, 1080, 3), dtype=np.uint8)
 
         # Capture one image per filter at this position
         for jdx, f in enumerate(FILTERS):
@@ -557,7 +565,7 @@ def automatic_measurement(z1, z2, modo=1):
             img2 = images_z2[i]
 
             # Compute the focal length and build the results table
-            ress, table = focal_distance_with_table(y0_row, img1, img2, dz, modo=modo)
+            ress, table = focal_distance_with_table(y0_row, img1, img2, dz, i, modo=modo)
             # Unpack the three result values
             res_eff_f, res_err_eff_f, delta_f = ress
 
