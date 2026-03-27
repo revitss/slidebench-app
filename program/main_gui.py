@@ -306,7 +306,7 @@ def build_camera_controls(parent, font, camera_label, last_image_label):
             return
 
         # Run the blob detection and distance calculation on the captured image
-        distances = compute_distances_to_center(img)
+        distances = compute_distances_to_center(img, 0)
 
         if np.all(distances == 0):
             # All distances are zero means no valid blobs were detected
@@ -488,8 +488,7 @@ def build_controller(parent, font, root):
     led_slider.grid(row=14, column=0, columnspan=2, padx=5, pady=5)
 
     # --- [FILTER CONTROL] ---
-    tk.Label(motor_frame, text="Filters", font=font).grid(
-        row=15, column=0, columnspan=2, pady=(10, 5))
+    tk.Label(motor_frame, text="Filters", font=font).grid(row=15, column=0, columnspan=2, pady=(10, 5))
     filter_frame = tk.Frame(motor_frame)
     filter_frame.grid(row=16, column=0, columnspan=2)
 
